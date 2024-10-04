@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Askify - AI-Powered PDF Query SaaS
 
-## Getting Started
+**Askify** is a cutting-edge AI SaaS application designed to allow users to upload PDF documents and query them using advanced AI models. The platform streamlines the process of extracting meaningful insights and answers from large PDF documents, making it ideal for researchers, professionals, and anyone handling a large amount of textual data.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **PDF Uploading**: Users can securely upload PDFs through an intuitive interface.
+- **AI-Powered Queries**: Powered by OpenAI and LangChain, Askify allows users to ask natural language questions related to their uploaded documents and get accurate answers.
+- **Real-Time Results**: Fast and efficient AI responses, thanks to the seamless integration with PineconeDB for vector storage and quick search.
+- **Authentication**: Secure user authentication and access control using Clerk.
+- **Scalability**: Scalable backend infrastructure using Supabase and PostgreSQL.
+- **Responsive Design**: Built with a responsive and sleek UI to ensure usability across devices.
+- **Subscription Plans**: Offer both free and pro subscription tiers with Stripe integration for handling payments.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: [Next.js](https://nextjs.org/) + [shadcn](https://shadcn.dev/) - Modern React framework combined with a flexible and accessible UI component library.
+- **Authentication**: [Clerk](https://clerk.dev/) - Easy and secure user management.
+- **Database**: [Supabase](https://supabase.io/) + PostgreSQL - Highly scalable and secure database solution.
+- **Vector Search**: [PineconeDB](https://www.pinecone.io/) - Fast, scalable vector search engine for querying embeddings.
+- **AI Models**: [Google Gemini Model](https://js.langchain.com/docs/integrations/platforms/google/) + [LangChain](https://js.langchain.com/docs/introduction/) - Natural language processing and query understanding.
+- **Payments & Subscriptions**: [Stripe](https://stripe.com/) - Payment processing for subscription plans (Free and Pro).
+- **Storage**: Cloudinary is used for pdf storage.
+- **Deployment**: Deployed on Vercel.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Local Development
 
-## Learn More
+To run this project locally, follow these steps:
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Node.js (v14 or higher)
+- npm or yarn
+- A `.env` file with the necessary environment variables (see `.env.example` for reference)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
+1. Clone the repository:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   ```sh
+   git clone https://github.com/Devankit-Sahu/askify.git
+   cd askify
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Install dependencies:
+
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Set up environment variables:
+
+   Copy the `.env.example` file to `.env` and fill in the required values.
+
+   ```sh
+   copy .env.example .env
+   ```
+
+### Running the Application
+
+1. Start the development server:
+
+   ```sh
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+2. Open your browser and navigate to `http://localhost:3000`.
