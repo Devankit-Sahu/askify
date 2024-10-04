@@ -1,6 +1,6 @@
 # Askify - AI-Powered PDF Query SaaS
 
-![HomePage Preview](public\homepage.png)
+![HomePage Preview](public/homepage.png)
 ![FileUpload Preview](public/fileupload-preview.png)
 ![ChatInterface Preview](public/preview.jpg)
 
