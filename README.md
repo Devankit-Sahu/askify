@@ -6,21 +6,23 @@
 
 **Askify** is a cutting-edge AI SaaS application designed to allow users to upload PDF documents and query them using advanced AI models. The platform streamlines the process of extracting meaningful insights and answers from large PDF documents, making it ideal for researchers, professionals, and anyone handling a large amount of textual data.
 
+## Project Flow
+![Architecture Preview](public/architecute.png)
+
 ## 🚀 Features
 
 - **PDF Uploading**: Users can securely upload PDFs through an intuitive interface.
-- **AI-Powered Queries**: Powered by OpenAI and LangChain, Askify allows users to ask natural language questions related to their uploaded documents and get accurate answers.
+- **AI-Powered Queries**: Powered by Grmini and LangChain, Askify allows users to ask natural language questions related to their uploaded documents and get accurate answers.
 - **Real-Time Results**: Fast and efficient AI responses, thanks to the seamless integration with PineconeDB for vector storage and quick search.
 - **Authentication**: Secure user authentication and access control using Clerk.
-- **Scalability**: Scalable backend infrastructure using Supabase and PostgreSQL.
 - **Responsive Design**: Built with a responsive and sleek UI to ensure usability across devices.
-- **Subscription Plans**: Offer both free and pro subscription tiers with Stripe integration for handling payments.
+- **Subscription Plans**: Offer both free and pro subscription tiers with stripe integration for handling payments.
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: [Next.js](https://nextjs.org/) + [shadcn](https://shadcn.dev/) - Modern React framework combined with a flexible and accessible UI component library.
 - **Authentication**: [Clerk](https://clerk.dev/) - Easy and secure user management.
-- **Database**: [Supabase](https://supabase.io/) + PostgreSQL - Highly scalable and secure database solution.
+- **Database**: PostgreSQL - Highly scalable and secure database solution.
 - **Vector Search**: [PineconeDB](https://www.pinecone.io/) - Fast, scalable vector search engine for querying embeddings.
 - **AI Models**: [Google Gemini Model](https://js.langchain.com/docs/integrations/platforms/google/) + [LangChain](https://js.langchain.com/docs/introduction/) - Natural language processing and query understanding.
 - **Payments & Subscriptions**: [Stripe](https://stripe.com/) - Payment processing for subscription plans (Free and Pro).

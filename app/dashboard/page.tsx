@@ -1,10 +1,10 @@
 import Heading from "@/components/dashboard/Heading";
-import { Button } from "@/components/ui/button";
-import { File, Ghost, Trash } from "lucide-react";
+import { File, Ghost } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import UploadButton from "@/components/UploadButton";
 import { getFiles } from "@/lib/actions/file.action";
+import DeleteButton from "@/components/DeleteButton";
 
 const Dashboard = async () => {
   const files = await getFiles();
@@ -52,9 +52,7 @@ const Dashboard = async () => {
                   <div className="flex items-center gap-2">
                     {format(new Date(file.createdAt), "MMM dd yyyy")}
                   </div>
-                  <Button size="sm" className="w-full" variant="destructive">
-                    <Trash className="h-4 w-4" />
-                  </Button>
+                  <DeleteButton fileId={file.id} publicId={file.public_id} />
                 </div>
               </li>
             ))}

@@ -24,3 +24,20 @@ export async function uploadFileToCloudinary(
       .end(fileBuffer);
   });
 }
+
+export async function deleteFileFromCloudinary(
+  publicId: string
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      publicId,
+      { resource_type: "raw" },
+      (error) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve();
+      }
+    );
+  });
+}
