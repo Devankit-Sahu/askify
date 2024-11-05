@@ -35,7 +35,6 @@ export async function POST(req: Request) {
         text: message,
         isUserMessage: true,
         fileId,
-        userId,
       },
     });
 
@@ -53,7 +52,7 @@ export async function POST(req: Request) {
     const results = await vectorstore.similaritySearch(message, 5);
 
     const preMessages = await prisma.message.findMany({
-      where: { fileId, userId },
+      where: { fileId },
       orderBy: { createdAt: "asc" },
     });
 
@@ -106,7 +105,6 @@ export async function POST(req: Request) {
         text: response.content as string,
         isUserMessage: false,
         fileId,
-        userId,
       },
     });
 
@@ -142,7 +140,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * MESSAGES_PER_PAGE;
 
     const messages = await prisma.message.findMany({
-      where: { fileId, userId },
+      where: { fileId },
       skip,
       take: MESSAGES_PER_PAGE,
       orderBy: { createdAt: "desc" },
