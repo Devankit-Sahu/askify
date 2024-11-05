@@ -7,6 +7,9 @@ import { pinecone } from "../pinecone.config";
 
 export const getFiles = async () => {
   const { userId } = auth();
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
   return await prisma.file.findMany({
     where: {
       userId,
