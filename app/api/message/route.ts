@@ -1,4 +1,3 @@
-import { MESSAGES_PER_PAGE } from "@/constants/constants";
 import prisma from "@/lib/db.config";
 import { model } from "@/lib/google-genai.config";
 import { pinecone } from "@/lib/pinecone.config";
@@ -61,12 +60,12 @@ export async function POST(req: Request) {
       content: message.text,
     }));
 
-    const prompt = `Use the following pieces of context to answer the user's question in markdown format.
+    const prompt = `Use the following pieces of context (or previous conversaton if needed) to answer the users question. \nIf you don't know the answer, just say that you don't know, don't try to make up an answer.
 
-      **Previous Conversation:**
+      **Previous conversation:**
       ${formattedPrevMessages.map((message) => {
-        if (message.role === "user") return `User: ${message.content}\n`;
-        return `Assistant: ${message.content}\n`;
+        if (message.role === "user") return `user: ${message.content}\n`;
+        return `assistant: ${message.content}\n`;
       })}
 
       **Context:**
@@ -75,30 +74,6 @@ export async function POST(req: Request) {
       **User Input:** ${message}`;
 
     const response = await model.invoke(prompt);
-
-    // const stream = new ReadableStream({
-    //   async start(controller) {
-    //     const response = await model.stream(prompt);
-    //     let aiMessageContent = "";
-
-    //     for await (const chunk of response) {
-    //       aiMessageContent += chunk.content;
-    //       controller.enqueue(new TextEncoder().encode(chunk.content as string));
-    //     }
-
-    //     if (aiMessageContent) {
-    //       await prisma.message.create({
-    //         data: {
-    //           text: aiMessageContent,
-    //           isUserMessage: false,
-    //           fileId,
-    //           userId,
-    //         },
-    //       });
-    //     }
-    //     controller.close();
-    //   },
-    // });
 
     await prisma.message.create({
       data: {
@@ -122,7 +97,6 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const fileId = searchParams.get("fileId");
-    const page = parseInt(searchParams.get("page") || "1");
 
     const { userId } = auth();
 
@@ -137,12 +111,8 @@ export async function GET(req: Request) {
       });
     }
 
-    const skip = (page - 1) * MESSAGES_PER_PAGE;
-
     const messages = await prisma.message.findMany({
       where: { fileId },
-      skip,
-      take: MESSAGES_PER_PAGE,
       orderBy: { createdAt: "desc" },
     });
 

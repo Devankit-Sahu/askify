@@ -2,7 +2,6 @@ export const PLANS = [
   {
     name: "free",
     fileSizeLimit: 4,
-    pagesPerPdf: 5,
     pdfsPerMonth: 10,
     price: {
       amount: 0,
@@ -15,7 +14,6 @@ export const PLANS = [
   {
     name: "pro",
     fileSizeLimit: 16,
-    pagesPerPdf: 25,
     pdfsPerMonth: 50,
     price: {
       amount: 20,
@@ -35,10 +33,6 @@ export const pricingDetails: priceDetail[] = [
     features: [
       {
         text: "10 pdfs per month",
-        isAvailable: true,
-      },
-      {
-        text: "5 pages per PDF",
         isAvailable: true,
       },
       {
@@ -69,10 +63,6 @@ export const pricingDetails: priceDetail[] = [
         isAvailable: true,
       },
       {
-        text: "25 pages per PDF",
-        isAvailable: true,
-      },
-      {
         text: "16MB file size limit",
         isAvailable: true,
       },
@@ -91,5 +81,3 @@ export const pricingDetails: priceDetail[] = [
     ],
   },
 ];
-
-export const MESSAGES_PER_PAGE = 5;

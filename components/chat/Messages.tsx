@@ -1,34 +1,16 @@
 "use client";
 
-import { useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
 import { ChatContext } from "./ChatContext";
 import Message from "./Message";
 import { MessageSquare } from "lucide-react";
 import Skeleton from "react-loading-skeleton";
-import { useIntersection } from "@mantine/hooks";
 
 const Messages = () => {
-  const { messages, isMessageFetchedLoading, fetchMoreMessages } =
-    useContext(ChatContext);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { ref, entry } = useIntersection({
-    root: containerRef.current,
-    threshold: 1,
-  });
-
-  useEffect(() => {
-    if (entry?.isIntersecting) {
-      fetchMoreMessages();
-    }
-  }, [entry]);
+  const { messages, isMessageFetchedLoading } = useContext(ChatContext);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex h-[calc(100vh-10.5rem)] border-zinc-200 flex-1 flex-col-reverse p-3 gap-4 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
-    >
+    <div className="flex h-[calc(100vh-10.5rem)] border-zinc-200 flex-1 flex-col-reverse p-3 gap-4 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
       {messages.length > 0 ? (
         messages.map((message: Message, index: number) => {
           const isNextMessageSamePerson =
@@ -37,7 +19,6 @@ const Messages = () => {
 
           return (
             <Message
-              ref={index === messages.length - 1 ? ref : null}
               message={message}
               isNextMessageSamePerson={isNextMessageSamePerson}
               key={index}

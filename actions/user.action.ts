@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import prisma from "../db.config";
+import prisma from "../lib/db.config";
 
 export async function createUser(
   data: Omit<

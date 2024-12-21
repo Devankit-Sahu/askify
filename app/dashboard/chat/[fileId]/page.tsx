@@ -1,7 +1,6 @@
 import ChatWrapper from "@/components/chat/ChatWrapper";
 import PdfRender from "@/components/dashboard/PdfRender";
-import { getFile } from "@/lib/actions/file.action";
-import { getUserSubscriptionPlan } from "@/lib/stripe.config";
+import { getFile } from "@/actions/file.action";
 
 type Props = {
   params: {
@@ -11,7 +10,6 @@ type Props = {
 
 const ChatPage = async ({ params }: Props) => {
   const file = await getFile(params.fileId);
-  const plan = await getUserSubscriptionPlan();
 
   if (!file) {
     return (
@@ -30,11 +28,7 @@ const ChatPage = async ({ params }: Props) => {
           </div>
         </div>
         <div className="shrink-0 flex-1 lg:flex-[0.75] border-t border-gray-300 lg:border-l lg:border-t-0">
-          <ChatWrapper
-            fileId={params.fileId}
-            status={file?.status}
-            isSubscribed={plan.isSubscribed}
-          />
+          <ChatWrapper fileId={params.fileId} />
         </div>
       </div>
     </section>

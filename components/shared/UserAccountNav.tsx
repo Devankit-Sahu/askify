@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
 import { Gem, UserRound } from "lucide-react";
 import { getUserSubscriptionPlan } from "@/lib/stripe.config";
-import { SignOutButton } from "@clerk/nextjs";
+import SignOutButton from "../SignOutButton";
 
 interface UserAccountNavProps {
   email: string | undefined;
@@ -87,7 +87,7 @@ const UserAccountNav = async ({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem className="cursor-pointer">
-          <SignOutButton redirectUrl="/">log out</SignOutButton>
+          <SignOutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

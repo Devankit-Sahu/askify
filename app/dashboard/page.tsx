@@ -3,7 +3,7 @@ import { File, Ghost } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import UploadButton from "@/components/UploadButton";
-import { getFiles } from "@/lib/actions/file.action";
+import { getFiles } from "@/actions/file.action";
 import DeleteButton from "@/components/DeleteButton";
 
 const Dashboard = async () => {

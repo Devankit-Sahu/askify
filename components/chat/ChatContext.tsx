@@ -11,7 +11,6 @@ type StreamResponse = {
   isMessageSentLoading: boolean;
   isMessageFetchedLoading: boolean;
   messages: Message[];
-  fetchMoreMessages: () => void;
 };
 
 export const ChatContext = createContext<StreamResponse>({
@@ -21,7 +20,6 @@ export const ChatContext = createContext<StreamResponse>({
   isMessageSentLoading: false,
   isMessageFetchedLoading: false,
   messages: [],
-  fetchMoreMessages: () => {},
 });
 
 interface Props {
@@ -37,8 +35,6 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
   const [isMessageSentLoading, setIsMessageSentLoading] =
     useState<boolean>(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -86,42 +82,6 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
 
     const data = await response.json();
 
-    // const reader = response.body?.getReader();
-    // const decoder = new TextDecoder();
-    // let done = false;
-    // let accResponse = "";
-
-    // while (reader && !done) {
-    //   const result = await reader.read();
-
-    //   if (result && result.value) {
-    //     const chunk = decoder.decode(result.value);
-    //     accResponse += chunk;
-
-    //     setMessages((prevMessages) => {
-    //       const updatedMessages = prevMessages.map((msg) => {
-    //         if (msg.id === "loading-message") {
-    //           return {
-    //             ...msg,
-    //             text: accResponse,
-    //           };
-    //         }
-    //         return msg;
-    //       });
-    //       return updatedMessages;
-    //     });
-
-    //     done = result.done;
-    //   }
-    // }
-
-    // const aiMessage = {
-    //   id: "ai-message",
-    //   text: accResponse,
-    //   isUserMessage: false,
-    //   createdAt: new Date().toISOString(),
-    // };
-
     setMessages((prevMessages) => [
       {
         id: "ai-message",
@@ -134,12 +94,10 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
     setIsMessageSentLoading(false);
   };
 
-  const fetchMessages = async (pageToFetch = 1) => {
+  const fetchMessages = async () => {
     setIsMessageFetchedLoading(true);
 
-    const response = await fetch(
-      `/api/message?fileId=${fileId}&page=${pageToFetch}`
-    );
+    const response = await fetch(`/api/message?fileId=${fileId}`);
 
     if (!response.ok) {
       toast({
@@ -150,16 +108,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
     }
 
     const data = await response.json();
-    if (data.messages.length === 0) setHasMoreMessages(false);
-    else setMessages((prevMessages) => [...prevMessages, ...data.messages]);
+    setMessages(data.messages);
     setIsMessageFetchedLoading(false);
-  };
-
-  const fetchMoreMessages = async () => {
-    if (!hasMoreMessages || isMessageFetchedLoading) return;
-    const nextPage = page + 1;
-    setPage(nextPage);
-    await fetchMessages(nextPage);
   };
 
   useEffect(() => {
@@ -177,7 +127,6 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         isMessageSentLoading,
         isMessageFetchedLoading,
         messages,
-        fetchMoreMessages,
       }}
     >
       {children}

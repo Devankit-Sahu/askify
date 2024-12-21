@@ -7,6 +7,9 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ["pdf-parse"],
+    serverActions: {
+      bodySizeLimit: "16mb",
+    },
   },
   images: {
     remotePatterns: [
