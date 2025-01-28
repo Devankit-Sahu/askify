@@ -30,6 +30,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PdfFullscreen from "./PdfFullscreen";
 import SimpleBar from "simplebar-react";
+import { Separator } from "../ui/separator";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -72,8 +73,8 @@ const PdfRender = ({ fileUrl }: PdfFullscreenProps) => {
   };
 
   return (
-    <div className="w-full bg-white rounded-md shadow flex flex-col items-center h-full overflow-hidden">
-      <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-between px-2">
+    <div className="w-full rounded-md shadow flex flex-col items-center h-full overflow-hidden">
+      <div className="h-14 w-full flex items-center justify-between px-2">
         <div className="flex items-center gap-1.5">
           <Button
             disabled={currPage <= 1}
@@ -157,7 +158,7 @@ const PdfRender = ({ fileUrl }: PdfFullscreenProps) => {
           <PdfFullscreen fileUrl={fileUrl} />
         </div>
       </div>
-
+      <Separator />
       <div className="flex-1 w-full h-[calc(100vh-11rem)]">
         <SimpleBar autoHide={false} className="h-[calc(100vh-11rem)]">
           <div ref={ref}>

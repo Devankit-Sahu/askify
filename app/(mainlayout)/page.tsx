@@ -24,8 +24,8 @@ const HomePage = () => {
       <div className="mb-32 mt-32">
         <div className="mb-12 px-6 lg:px-8">
           <div className="mx-auto max-w-2xl sm:text-center">
-            <h2 className="mt-2 font-bold text-4xl text-gray-900 sm:text-5xl">
-              Start chatting in minutes
+            <h2 className="mt-2 font-bold text-4xl sm:text-5xl">
+              Start quering in minutes
             </h2>
             <p className="mt-4 text-lg text-gray-600">
               Chatting to your PDF files has never been easier than with Askify.
@@ -33,7 +33,7 @@ const HomePage = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-10 gap-y-10">
-          <Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary relative">
             <CardHeader>
               <CardTitle>Sign up for an account</CardTitle>
             </CardHeader>
@@ -47,7 +47,7 @@ const HomePage = () => {
               </Link>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary relative">
             <CardHeader>
               <CardTitle>Upload your PDF file</CardTitle>
             </CardHeader>
@@ -56,7 +56,7 @@ const HomePage = () => {
               with.
             </CardContent>
           </Card>
-          <Card>
+          <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary relative">
             <CardHeader>
               <CardTitle>Start asking questions</CardTitle>
             </CardHeader>

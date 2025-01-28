@@ -22,16 +22,16 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
           className={cn(
             "relative flex h-6 w-6 aspect-square items-center justify-center",
             {
-              "order-2 bg-blue-600 rounded-sm": message.isUserMessage,
-              "order-1 bg-zinc-200 rounded-sm": !message.isUserMessage,
+              "order-2 rounded-sm": message.isUserMessage,
+              "order-1 rounded-sm": !message.isUserMessage,
               invisible: isNextMessageSamePerson,
             }
           )}
         >
           {message.isUserMessage ? (
-            <User className="fill-zinc-200 text-zinc-200 h-3/4 w-3/4" />
+            <User className="h-3/4 w-3/4 text-blue-600" />
           ) : (
-            <Bot className="fill-zinc-300 h-3/4 w-3/4" />
+            <Bot className="h-3/4 w-3/4" />
           )}
         </div>
 

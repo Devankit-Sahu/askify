@@ -1,7 +1,8 @@
-import { getUserSubscriptionPlan, stripe } from "@/lib/stripe.config";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db.config";
 import { auth } from "@clerk/nextjs/server";
+import { getUserSubscriptionPlan } from "@/app/actions";
+import { stripe } from "@/lib/stripe.config";
 
 export async function POST(req: Request) {
   try {

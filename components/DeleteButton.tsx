@@ -3,7 +3,7 @@
 import { toast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import { Trash } from "lucide-react";
-import { deleteFile } from "@/actions/file.action";
+import { deleteFile } from "@/app/actions";
 
 const DeleteButton = ({
   fileId,

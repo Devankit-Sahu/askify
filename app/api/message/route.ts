@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       content: message.text,
     }));
 
-    const prompt = `Use the following pieces of context (or previous conversaton if needed) to answer the users question. \nIf you don't know the answer, just say that you don't know, don't try to make up an answer.
+    const prompt = `You are an AI assitant for question answering tasks. Use the following pieces of context (or previous conversaton if needed) to answer the users question. \nIf you don't know the answer, just say that you don't know, don't try to make up an answer.
 
       **Previous conversation:**
       ${formattedPrevMessages.map((message) => {

@@ -1,6 +1,6 @@
+import { getUserSubscriptionPlan } from "@/app/actions";
 import BillingFrom from "@/components/BillingFrom";
 import Heading from "@/components/dashboard/Heading";
-import { getUserSubscriptionPlan } from "@/lib/stripe.config";
 
 const Billing = async () => {
   const subscriptionPlan = await getUserSubscriptionPlan();

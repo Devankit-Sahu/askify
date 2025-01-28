@@ -8,7 +8,7 @@ type Props = {
 
 function Heading({ heading, className }: Props) {
   return (
-    <h1 className={cn("text-2xl font-bold text-gray-500", className)}>
+    <h1 className={cn("text-2xl font-bold", className)}>
       {heading}
     </h1>
   );

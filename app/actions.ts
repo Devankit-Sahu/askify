@@ -2,13 +2,78 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "../lib/db.config";
+import { deleteFileFromCloudinary } from "../lib/cloudinary.config";
+import { pinecone } from "../lib/pinecone.config";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { pinecone } from "../lib/pinecone.config";
 import { PineconeStore } from "@langchain/pinecone";
 import { uploadFileToCloudinary } from "../lib/cloudinary.config";
 import { PLANS } from "@/constants/constants";
 import { stripe } from "../lib/stripe.config";
+
+export const getFiles = async () => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+  return await prisma.file.findMany({
+    where: {
+      userId,
+    },
+  });
+};
+
+export const getFile = async (fileId: string) => {
+  return await prisma.file.findUnique({
+    where: {
+      id: fileId,
+    },
+  });
+};
+
+export const deleteFile = async (fileId: string, publicId: string) => {
+  if (!fileId || !publicId) {
+    throw new Error("fileId and publicId are required");
+  }
+
+  const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX!);
+  await pineconeIndex.namespace(fileId).deleteAll();
+  await deleteFileFromCloudinary(publicId);
+  return await prisma.file.delete({
+    where: {
+      id: fileId,
+    },
+  });
+};
+
+export const getFilesByCurrentMonth = async () => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const currentDate = new Date();
+  const startOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  );
+  const endOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  );
+
+  return await prisma.file.findMany({
+    where: {
+      userId,
+      createdAt: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
+    },
+  });
+};
 
 export const fileUploadHandler = async (formData: FormData) => {
   try {
@@ -102,7 +167,7 @@ export async function getUserSubscriptionPlan() {
 
   const plan = isSubscribed
     ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId)
-    : null;
+    : PLANS[0];
 
   let isCanceled = false;
 
@@ -121,4 +186,44 @@ export async function getUserSubscriptionPlan() {
     isSubscribed,
     isCanceled,
   };
+}
+
+export async function createUser(
+  data: Omit<
+    User,
+    | "createdAt"
+    | "stripeCustomerId"
+    | "stripeSubscriptionId"
+    | "stripePriceId"
+    | "stripeCurrentPeriodEnd"
+  >
+) {
+  try {
+    let user = await prisma.user.findFirst({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (!user) user = await prisma.user.create({ data });
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getUser() {
+  try {
+    const { userId } = auth();
+    if (!userId) return null;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
 }

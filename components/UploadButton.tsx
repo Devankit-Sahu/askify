@@ -25,7 +25,7 @@ const UploadButton = () => {
           <span> upload</span>
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="border-none">
         <DialogTitle className="hidden" />
         <FileUpload setIsOpen={setIsOpen} />
       </DialogContent>

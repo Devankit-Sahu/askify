@@ -7,7 +7,7 @@ const SignOutButton = () => {
   const { signOut } = useClerk();
 
   return (
-    <button onClick={() => signOut({ redirectUrl: "/" })}>Log Out</button>
+    <button className="w-full text-start" onClick={() => signOut({ redirectUrl: "/" })}>Log Out</button>
   );
 };
 

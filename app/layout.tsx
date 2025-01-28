@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Roboto } from "next/font/google";
-import Navbar from "@/components/shared/Navbar";
-import Footer from "@/components/shared/Footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import "simplebar-react/dist/simplebar.min.css";
 import "react-loading-skeleton/dist/skeleton.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -25,14 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${roboto.className} bg-gray-50`}>
-          <Navbar />
-          <main className="max-w-7xl mx-auto w-full px-20 lg:px-10 min-h-[calc(100vh-90px)] mb-10">
-            {children}
-          </main>
-          <Footer />
-          <Toaster />
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${roboto.className}`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <main> {children}</main>
+            <Toaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
