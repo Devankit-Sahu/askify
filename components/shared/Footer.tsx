@@ -2,15 +2,11 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer>
-      <div className="flex justify-center items-center gap-5 py-5 border-t border-border">
-        <p className="text-sm text-gray-500">
-          © 2024
-          <span className="font-semibold text-purple-600">
-            &nbsp;Askify.&nbsp;
-          </span>
-          All rights reserved.
-        </p>
+    <footer className="border-t py-8 bg-muted/50">
+      <div className="container px-10">
+        <div className="text-center text-sm text-muted-foreground">
+          © 2024 Askify. All rights reserved.
+        </div>
       </div>
     </footer>
   );

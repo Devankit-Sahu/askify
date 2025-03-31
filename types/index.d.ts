@@ -16,11 +16,12 @@ interface PdfFullscreenProps {
   fileUrl: string;
 }
 
-interface priceDetail {
-  plan: string;
+interface planDetail {
+  name: string;
   description: string;
   price: string;
-  features: { text: string; isAvailable: boolean }[];
+  features: string[];
+  popular?: boolean;
 }
 
 interface UploadResult {

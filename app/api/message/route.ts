@@ -16,6 +16,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized", status: 401 });
     }
 
+    if (typeof message !== "string" || typeof fileId !== "string") {
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 }
+      );
+    }
+
     if (!message || !fileId) {
       return NextResponse.json({
         error: "Message or fileId filed is missing",
@@ -50,17 +57,17 @@ export async function POST(req: Request) {
 
     const results = await vectorstore.similaritySearch(message, 5);
 
-    const preMessages = await prisma.message.findMany({
+    const previousMessages = await prisma.message.findMany({
       where: { fileId },
       orderBy: { createdAt: "asc" },
     });
 
-    const formattedPrevMessages = preMessages.map((message) => ({
-      role: message.isUserMessage ? ("user" as const) : ("assistant" as const),
-      content: message.text,
+    const formattedPrevMessages = previousMessages.map((msg) => ({
+      role: msg.isUserMessage ? "user" : "assistant",
+      content: msg.text,
     }));
 
-    const prompt = `You are an AI assitant for question answering tasks. Use the following pieces of context (or previous conversaton if needed) to answer the users question. \nIf you don't know the answer, just say that you don't know, don't try to make up an answer.
+    const prompt = `You are an AI assistant for answering user queries based on previous conversations and relevant document context. If the user's question is not related to the document or the previous conversation, respond with: "I can’t answer this question as it is outside the context of the document."
 
       **Previous conversation:**
       ${formattedPrevMessages.map((message) => {
@@ -74,17 +81,21 @@ export async function POST(req: Request) {
       **User Input:** ${message}`;
 
     const response = await model.invoke(prompt);
+    const botReply =
+      // @ts-expect-error: `response.content` might be undefined or not properly typed
+      response?.content?.trim() ||
+      "I can’t answer this question as it is outside the context of the document.";
 
     await prisma.message.create({
       data: {
-        text: response.content as string,
+        text: botReply,
         isUserMessage: false,
         fileId,
       },
     });
 
     return NextResponse.json({
-      text: response.content,
+      text: botReply,
       status: 200,
     });
   } catch (error) {

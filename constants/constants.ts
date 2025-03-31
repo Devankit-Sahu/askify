@@ -25,59 +25,29 @@ export const PLANS = [
   },
 ];
 
-export const pricingDetails: priceDetail[] = [
+export const plansDetails: planDetail[] = [
   {
-    plan: "free",
-    description: "for individuals and small teams",
-    price: "$0/month",
+    name: "Free",
+    description: "Perfect for trying out Askify",
+    price: "0",
     features: [
-      {
-        text: "10 pdfs per month",
-        isAvailable: true,
-      },
-      {
-        text: "4MB file size limit",
-        isAvailable: true,
-      },
-      {
-        text: "Mobile-friendly interface",
-        isAvailable: true,
-      },
-      {
-        text: "Higher-quality responses",
-        isAvailable: true,
-      },
-      {
-        text: "Priority support",
-        isAvailable: false,
-      },
+      "2 document uploads",
+      "100 questions per month",
+      "Basic document formats(Pdf)",
+      "24-hour response history",
     ],
   },
   {
-    plan: "pro",
-    description: "for larger projects with higher needs",
-    price: "$20/month",
+    name: "Pro",
+    description: "For large teams and organizations",
+    price: "20",
     features: [
-      {
-        text: "50 pdfs per month",
-        isAvailable: true,
-      },
-      {
-        text: "16MB file size limit",
-        isAvailable: true,
-      },
-      {
-        text: "Mobile-friendly interface",
-        isAvailable: true,
-      },
-      {
-        text: "Higher-quality responses",
-        isAvailable: true,
-      },
-      {
-        text: "Priority support",
-        isAvailable: true,
-      },
+      "Unlimited document uploads",
+      "Unlimited questions",
+      "All document formats",
+      "30-day response history",
+      "Priority support",
     ],
+    popular: true,
   },
 ];

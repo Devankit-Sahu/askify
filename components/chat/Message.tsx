@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Bot, User } from "lucide-react";
+import { Bot, MessageSquare } from "lucide-react";
 import { forwardRef } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -29,9 +29,13 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
           )}
         >
           {message.isUserMessage ? (
-            <User className="h-3/4 w-3/4 text-blue-600" />
+            <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+              <MessageSquare className="h-4 w-4" />
+            </div>
           ) : (
-            <Bot className="h-3/4 w-3/4" />
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <Bot className="h-4 w-4 text-primary-foreground" />
+            </div>
           )}
         </div>
 
@@ -53,7 +57,7 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
           >
             {typeof message.text === "string" ? (
               <ReactMarkdown
-                className={cn("prose", {
+                className={cn("prose font-sans", {
                   "text-zinc-50": message.isUserMessage,
                 })}
               >

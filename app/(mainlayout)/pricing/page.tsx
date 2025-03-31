@@ -1,40 +1,62 @@
 import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import UpgradeButton from "@/components/UpgradeButton";
-import { pricingDetails } from "@/constants/constants";
-import { cn } from "@/lib/utils";
+import { plansDetails } from "@/constants/constants";
 import { currentUser } from "@clerk/nextjs/server";
-import { Check, Minus } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
 
 const Pricing = async () => {
   const user = await currentUser();
   return (
-    <section className="pricing pb-40">
-      <h1 className="text-5xl capitalize text-center font-semibold my-5">
-        askify pricing
-      </h1>
-      <p className="text-sm text-gray-600 capitalize text-center mb-20">
-        Pricing plans that grow with you. From prototype to Enterprise.
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10">
-        {pricingDetails.map((pricingDetail, index) => (
-          <div
-            key={index}
-            className={cn("border border-gray-200 rounded-lg shadow p-8", {
-              "border-2 border-purple-600": pricingDetail.plan === "pro",
-            })}
-          >
-            <h1 className="capitalize text-2xl mb-2">
-              {pricingDetail.plan} plan
-            </h1>
-            <p className="capitalize text-gray-400 font-thin text-sm mb-2">
-              {pricingDetail.description}
-            </p>
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold py-10">
-                {pricingDetail.price}
-              </h1>
-              {pricingDetail.plan === "free" ? (
+    <section className="min-h-screen py-20">
+      <div className="container px-4">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl font-bold mb-4">
+            Simple, transparent pricing
+          </h1>
+          <p className="text-xl text-muted-foreground">
+            Choose the plan that&apos;s right for you or your team
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {plansDetails.map((pricingDetail) => (
+            <Card
+              key={pricingDetail.name}
+              className={`p-8 ${
+                pricingDetail.popular
+                  ? "border-primary shadow-lg scale-105"
+                  : ""
+              }`}
+            >
+              {pricingDetail.popular && (
+                <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full absolute -top-3 left-1/2 -translate-x-1/2">
+                  Most Popular
+                </span>
+              )}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold">{pricingDetail.name}</h2>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold">
+                    ${pricingDetail.price}
+                  </span>
+                  <span className="text-muted-foreground ml-2">/month</span>
+                </div>
+                <p className="mt-4 text-muted-foreground">
+                  {pricingDetail.description}
+                </p>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                {pricingDetail.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-primary" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {pricingDetail.name === "Free" ? (
                 <Link
                   href={user ? "/dashboard" : "/sign-in"}
                   className={buttonVariants({
@@ -56,29 +78,9 @@ const Pricing = async () => {
                   upgrade now
                 </Link>
               )}
-              <ul className="mt-5">
-                {pricingDetail.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 mb-2">
-                    <div className="bg-gray-200 rounded-full p-[2px]">
-                      {feature.isAvailable ? (
-                        <Check size={15} className="text-blue-500" />
-                      ) : (
-                        <Minus size={15} className="text-gray-500" />
-                      )}
-                    </div>
-                    <p
-                      className={cn("text-gray-700", {
-                        "text-gray-400": !feature.isAvailable,
-                      })}
-                    >
-                      {feature.text}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
+            </Card>
+          ))}
+        </div>
       </div>
     </section>
   );
