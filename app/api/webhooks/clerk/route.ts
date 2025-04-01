@@ -106,7 +106,7 @@ export async function POST(req: Request) {
     };
 
     try {
-      //@ts-expect-error
+      //@ts-expect-error - The type of the function is not matching the type of the data
       await updateUser(updatedUserData);
       return NextResponse.json(
         { message: "User updated successfully" },

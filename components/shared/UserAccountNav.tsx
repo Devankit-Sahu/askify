@@ -11,7 +11,6 @@ import Image from "next/image";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
 import { Gem, UserRound } from "lucide-react";
-import SignOutButton from "../CustomSignOutButton";
 import { getUserSubscriptionPlan } from "@/app/actions";
 import CustomSignOutButton from "../CustomSignOutButton";
 
