@@ -62,7 +62,7 @@ const HowItWorksSection = () => {
                   <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
                     <Bot className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  <Card className="p-3">
+                  <Card className="p-3 bg-primary text-primary-foreground">
                     <p className="text-sm">
                       I&apos;ve analyzed the roadmap. What would you like to
                       know?
@@ -70,11 +70,14 @@ const HowItWorksSection = () => {
                   </Card>
                 </div>
                 <div className="flex gap-3 items-start justify-end">
-                  <Card className="p-3 bg-primary text-primary-foreground">
+                  <Card className="p-3 bg-muted">
                     <p className="text-sm">
                       What are the key features planned for Q2?
                     </p>
                   </Card>
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                    <MessageSquare className="h-4 w-4" />
+                  </div>
                 </div>
               </div>
             </Card>

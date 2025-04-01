@@ -46,21 +46,21 @@ const HeroSection = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="flex gap-3 items-start">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <MessageSquare className="h-4 w-4" />
-                  </div>
+                <div className="flex gap-3 items-start justify-end">
                   <Card className="p-3 bg-muted">
                     <p className="text-sm">
                       What were the key revenue drivers in Q4?
                     </p>
                   </Card>
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                    <MessageSquare className="h-4 w-4" />
+                  </div>
                 </div>
                 <div className="flex gap-3 items-start">
                   <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
                     <Bot className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  <Card className="p-3">
+                  <Card className="p-3 bg-primary text-primary-foreground">
                     <p className="text-sm">
                       Based on the Q4 analysis, the key revenue drivers were: 1.
                       Enterprise subscription growth (+45%) 2. International
@@ -69,15 +69,15 @@ const HeroSection = () => {
                     </p>
                   </Card>
                 </div>
-                <div className="flex gap-3 items-start">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                    <MessageSquare className="h-4 w-4" />
-                  </div>
+                <div className="flex gap-3 items-start justify-end">
                   <Card className="p-3 bg-muted">
                     <p className="text-sm">
                       Can you break down the APAC growth?
                     </p>
                   </Card>
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                    <MessageSquare className="h-4 w-4" />
+                  </div>
                 </div>
                 <div className="flex gap-3 items-start">
                   <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">

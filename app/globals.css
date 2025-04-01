@@ -89,12 +89,12 @@
 
 .scrollbar-track-blue-lighter::-webkit-scrollbar-track {
   --bg-opacity: 0.5;
-  background-color: #8a11d516;
+  background-color: #040cea16;
 }
 
 .scrollbar-thumb-blue::-webkit-scrollbar-thumb {
   --bg-opacity: 0.5;
-  background-color: #b269e0df;
+  background-color: #3b82f6;
 }
 
 .scrollbar-thumb-rounded::-webkit-scrollbar-thumb {

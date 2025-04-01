@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import "simplebar-react/dist/simplebar.min.css";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +34,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main>{children}</main>
+            <Navbar />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
             <Toaster />
           </ThemeProvider>
         </body>

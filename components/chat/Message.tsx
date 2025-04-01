@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+// import { format } from "date-fns";
 import { Bot, MessageSquare } from "lucide-react";
 import { forwardRef } from "react";
 import ReactMarkdown from "react-markdown";
@@ -47,8 +47,8 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
         >
           <div
             className={cn("px-4 py-2 rounded-lg", {
-              "bg-blue-600 text-white": message.isUserMessage,
-              "bg-gray-200 text-gray-900": !message.isUserMessage,
+              "bg-muted": message.isUserMessage,
+              "bg-primary text-primary-foreground": !message.isUserMessage,
               "rounded-tr-none":
                 !isNextMessageSamePerson && message.isUserMessage,
               "rounded-tl-none":
@@ -56,26 +56,22 @@ const Message = forwardRef<HTMLDivElement, MessageProps>(
             })}
           >
             {typeof message.text === "string" ? (
-              <ReactMarkdown
-                className={cn("prose font-sans", {
-                  "text-zinc-50": message.isUserMessage,
-                })}
-              >
+              <ReactMarkdown className="text-base font-sans">
                 {message.text}
               </ReactMarkdown>
             ) : (
               message.text
             )}
-            {message.id !== "loading-message" ? (
+            {/* {message.id !== "loading-message" ? (
               <div
                 className={cn("text-xs select-none mt-2 w-full text-right", {
-                  "text-zinc-500": !message.isUserMessage,
-                  "text-blue-300": message.isUserMessage,
+                  "text-muted": message.isUserMessage,
+                  "text-primary-foreground": !message.isUserMessage,
                 })}
               >
                 {format(new Date(message.createdAt), "HH:mm")}
               </div>
-            ) : null}
+            ) : null} */}
           </div>
         </div>
       </div>

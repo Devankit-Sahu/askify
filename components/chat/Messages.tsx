@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { ChatContext } from "./ChatContext";
+import { ChatContext } from "../../context/ChatContext";
 import Message from "./Message";
 import { Loader2, MessageSquare } from "lucide-react";
 
