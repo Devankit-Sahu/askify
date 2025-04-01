@@ -11,8 +11,9 @@ import Image from "next/image";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
 import { Gem, UserRound } from "lucide-react";
-import SignOutButton from "../SignOutButton";
+import SignOutButton from "../CustomSignOutButton";
 import { getUserSubscriptionPlan } from "@/app/actions";
+import CustomSignOutButton from "../CustomSignOutButton";
 
 interface UserAccountNavProps {
   email: string | undefined;
@@ -86,8 +87,8 @@ const UserAccountNav = async ({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer">
-          <SignOutButton />
+        <DropdownMenuItem asChild className="cursor-pointer w-full">
+          <CustomSignOutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

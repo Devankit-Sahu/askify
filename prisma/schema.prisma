@@ -9,18 +9,17 @@ datasource db {
 }
 
 model User {
-  id                     String    @id @unique
-  email                  String    @unique
-  username               String?   @db.VarChar(255)
-  imageUrl               String?
-  oauthId                String?
-  oauthProvider          String?
-  files                  File[]
-  createdAt              DateTime  @default(now())
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  id               String        @id @unique
+  email            String        @unique
+  username         String?       @db.VarChar(255)
+  imageUrl         String?
+  oauthId          String?
+  oauthProvider    String?
+  files            File[]
+  createdAt        DateTime      @default(now())
+  stripeCustomerId String?       @unique @map(name: "stripe_customer_id")
+  subscription     Subscription?
+  // Invoice          Invoice[]
 
   @@map("users")
 }
@@ -39,7 +38,7 @@ model File {
   status    UploadStatus @default(PENDING)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-  User      User        @relation(fields: [userId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
   messages  Message[]
   userId    String
 
@@ -52,8 +51,55 @@ model Message {
   isUserMessage Boolean
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  File          File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  File          File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId        String
 
   @@map("messages")
 }
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId               String             @unique
+  stripeSubscriptionId String             @unique @map(name: "stripe_subscription_id")
+  stripePriceId        String             @map(name: "stripe_price_id")
+  status               SubscriptionStatus
+  currentPeriodStart   DateTime           @map(name: "stripe_current_period_start")
+  currentPeriodEnd     DateTime           @map(name: "stripe_current_period_end")
+  cancelAtPeriodEnd    Boolean            @default(false)
+  // invoices             Invoice[]
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+}
+
+// model Invoice {
+//   id              String        @id @default(cuid())
+//   user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   subscription    Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+//   userId          String
+//   subscriptionId  String
+//   stripeInvoiceId String        @unique @map(name: "stripe_invoice_id")
+//   amountPaid      Int           @map(name: "amount_paid")
+//   currency        String        @default("usd")
+//   status          InvoiceStatus
+//   invoiceUrl      String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@map("invoices")
+// }
+
+// enum InvoiceStatus {
+//   PAID
+//   OPEN
+//   VOID
+//   UNCOLLECTIBLE
+// }

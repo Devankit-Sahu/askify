@@ -1,7 +1,7 @@
+import { loggedInUser } from "@/app/actions";
 import prisma from "@/lib/db.config";
 import { model } from "@/lib/google-genai.config";
 import { pinecone } from "@/lib/pinecone.config";
-import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PineconeStore } from "@langchain/pinecone";
 import { NextResponse } from "next/server";
@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { message, fileId } = body;
-    const { userId } = auth();
+    const user = loggedInUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized", status: 401 });
     }
 
@@ -30,7 +30,10 @@ export async function POST(req: Request) {
       });
     }
 
-    const file = await prisma.file.findFirst({ where: { id: fileId, userId } });
+    const file = await prisma.file.findFirst({
+      //@ts-expect-error: `userId` might be undefined or not properly typed
+      where: { id: fileId, userId: user.id },
+    });
 
     if (!file) {
       return NextResponse.json({ error: "File not found", status: 404 });
@@ -44,19 +47,22 @@ export async function POST(req: Request) {
       },
     });
 
+    // Set up embeddings and vector store
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.GOOGLE_API_KEY!,
       model: "text-embedding-004",
     });
-    const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX!);
 
+    const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX!);
     const vectorstore = await PineconeStore.fromExistingIndex(embeddings, {
       pineconeIndex,
       namespace: file.id,
     });
 
+    // Get relevant context using similarity search
     const results = await vectorstore.similaritySearch(message, 5);
 
+    // Fetch previous messages from the database
     const previousMessages = await prisma.message.findMany({
       where: { fileId },
       orderBy: { createdAt: "asc" },
@@ -109,9 +115,9 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const fileId = searchParams.get("fileId");
 
-    const { userId } = auth();
+    const user = await loggedInUser();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized", status: 401 });
     }
 
@@ -126,10 +132,6 @@ export async function GET(req: Request) {
       where: { fileId },
       orderBy: { createdAt: "desc" },
     });
-
-    if (!messages.length) {
-      return NextResponse.json({ messages: [], status: 204 });
-    }
 
     return NextResponse.json({ messages, status: 200 });
   } catch (error) {

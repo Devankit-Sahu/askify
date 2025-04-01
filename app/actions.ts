@@ -11,6 +11,80 @@ import { uploadFileToCloudinary } from "../lib/cloudinary.config";
 import { PLANS } from "@/constants/constants";
 import { stripe } from "../lib/stripe.config";
 
+export async function createUser(
+  data: Omit<
+    User,
+    | "createdAt"
+    | "stripeCustomerId"
+    | "stripeSubscriptionId"
+    | "stripePriceId"
+    | "stripeCurrentPeriodEnd"
+  >
+) {
+  try {
+    let user = await prisma.user.findFirst({
+      where: {
+        email: data.email,
+      },
+    });
+
+    if (!user) user = await prisma.user.create({ data });
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function loggedInUser() {
+  try {
+    const { userId } = auth();
+    if (!userId) return null;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) return null;
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateUser(data: {
+  id: string;
+  email?: string;
+  username?: string;
+  imageUrl?: string;
+}) {
+  try {
+    const { id, email, username, imageUrl } = data;
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        email,
+        username,
+        imageUrl,
+      },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function deleteUser(userId: string) {
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const getFiles = async () => {
   const { userId } = auth();
   if (!userId) {
@@ -186,44 +260,4 @@ export async function getUserSubscriptionPlan() {
     isSubscribed,
     isCanceled,
   };
-}
-
-export async function createUser(
-  data: Omit<
-    User,
-    | "createdAt"
-    | "stripeCustomerId"
-    | "stripeSubscriptionId"
-    | "stripePriceId"
-    | "stripeCurrentPeriodEnd"
-  >
-) {
-  try {
-    let user = await prisma.user.findFirst({
-      where: {
-        email: data.email,
-      },
-    });
-
-    if (!user) user = await prisma.user.create({ data });
-
-    return user;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function getUser() {
-  try {
-    const { userId } = auth();
-    if (!userId) return null;
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    return user;
-  } catch (error) {
-    throw error;
-  }
 }

@@ -2,7 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { createUser } from "@/app/actions";
+import { createUser, deleteUser, updateUser } from "@/app/actions";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       evt.data;
 
     if (!id || !email_addresses || !email_addresses[0].email_address) {
-      return new Response("Error occured -- no email", {
+      return new Response("Missing required user data (email)", {
         status: 400,
       });
     }
@@ -79,10 +79,61 @@ export async function POST(req: Request) {
       oauthProvider,
     };
 
-    await createUser(userData);
+    try {
+      await createUser(userData);
+      return NextResponse.json(
+        { message: "User created successfully" },
+        { status: 201 }
+      );
+    } catch (err) {
+      console.error("Error creating user:", err);
+      return new Response("Failed to create user", { status: 500 });
+    }
+  } else if (evt.type === "user.updated") {
+    const { id, username, email_addresses, image_url } = evt.data;
 
-    return NextResponse.json({ message: "User created successfully" });
+    if (!id || !email_addresses || !email_addresses[0]?.email_address) {
+      return new Response("Missing required user data (email)", {
+        status: 400,
+      });
+    }
+
+    const updatedUserData = {
+      id,
+      email: email_addresses[0].email_address,
+      username,
+      imageUrl: image_url,
+    };
+
+    try {
+      //@ts-expect-error
+      await updateUser(updatedUserData);
+      return NextResponse.json(
+        { message: "User updated successfully" },
+        { status: 200 }
+      );
+    } catch (err) {
+      console.error("Error updating user:", err);
+      return new Response("Failed to update user", { status: 500 });
+    }
+  } else if (evt.type === "user.deleted") {
+    const { id } = evt.data;
+
+    if (!id) {
+      return new Response("Missing required user id", { status: 400 });
+    }
+
+    try {
+      await deleteUser(id);
+      return NextResponse.json(
+        { message: "User deleted successfully" },
+        { status: 200 }
+      );
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      return new Response("Failed to delete user", { status: 500 });
+    }
+  } else {
+    return new Response("Event type not handled", { status: 200 });
   }
-
-  return new Response("", { status: 200 });
 }
