@@ -7,7 +7,8 @@ import { InvoiceStatus } from "@prisma/client";
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get("Stripe-Signature") ?? "";
+  const headerPayload = await headers();
+  const signature = headerPayload.get("Stripe-Signature") ?? "";
 
   let event: Stripe.Event;
 
