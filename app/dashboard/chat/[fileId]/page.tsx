@@ -3,14 +3,13 @@ import ChatWrapper from "@/components/chat/ChatWrapper";
 import PdfRender from "@/components/dashboard/PdfRender";
 import { Card } from "@/components/ui/card";
 
-type Props = {
-  params: {
-    fileId: string;
-  };
-};
-
-const ChatPage = async ({ params }: Props) => {
-  const file = await getFile(params.fileId);
+const ChatPage = async ({
+  params,
+}: {
+  params: Promise<{ fileId: string }>;
+}) => {
+  const { fileId } = await params;
+  const file = await getFile(fileId);
 
   if (!file) {
     return (
@@ -28,7 +27,7 @@ const ChatPage = async ({ params }: Props) => {
             <PdfRender fileUrl={file.url} />
           </div>
           <div className="p-4 shrink-0 flex-1 border-t border-border lg:border-l lg:border-t-0">
-            <ChatWrapper fileId={params.fileId} />
+            <ChatWrapper fileId={fileId} />
           </div>
         </Card>
       </div>

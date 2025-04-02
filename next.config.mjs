@@ -5,8 +5,8 @@ const nextConfig = {
     config.resolve.alias.encoding = false;
     return config;
   },
+  serverExternalPackages: ["pdf-parse"],
   experimental: {
-    serverComponentsExternalPackages: ["pdf-parse"],
     serverActions: {
       bodySizeLimit: "16mb",
     },
