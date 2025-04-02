@@ -98,7 +98,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     where: { userId: user.id },
     update: {
       planName: subscription.items.data[0].price.nickname || "Pro",
-      stripeSubscriptionId: subscription.id,
+      id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
       status: subscription.status === "active" ? "ACTIVE" : "CANCELED",
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
@@ -111,7 +111,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     create: {
       userId: user.id,
       planName: subscription.items.data[0].price.nickname || "Pro",
-      stripeSubscriptionId: subscription.id,
+      id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
       status: subscription.status === "active" ? "ACTIVE" : "CANCELED",
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
@@ -140,21 +140,22 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
 // Handle Invoice Payment Success
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const user = await prisma.user.findUnique({
-    where: { stripeCustomerId: invoice.customer as string },
+  const subscription = await prisma.subscription.findUnique({
+    where: { id: invoice.subscription as string },
   });
 
-  if (!user) {
-    console.error(`No user found for invoice: ${invoice.id}`);
+  if (!subscription) {
+    console.error(`No subscription found for invoice: ${invoice.id}`);
     return;
   }
 
   await prisma.invoice.create({
     data: {
-      userId: user.id,
-      subscriptionId: invoice.subscription as string,
+      subscriptionId: subscription.id,
       stripeInvoiceId: invoice.id,
-      amountPaid: invoice.amount_paid,
+      amountPaid: invoice.amount_paid / 100,
+      amountDue: invoice.amount_due / 100,
+      amountRemaining: invoice.amount_remaining / 100,
       currency: invoice.currency,
       status: (invoice.status?.toUpperCase() as InvoiceStatus) ?? "PAID",
       invoiceUrl: invoice.hosted_invoice_url ?? "",
@@ -164,21 +165,22 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
 // Handle Invoice Payment Failure
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  const user = await prisma.user.findUnique({
-    where: { stripeCustomerId: invoice.customer as string },
+  const subscription = await prisma.subscription.findUnique({
+    where: { id: invoice.subscription as string },
   });
 
-  if (!user) {
-    console.error(`No user found for failed invoice: ${invoice.id}`);
+  if (!subscription) {
+    console.error(`No subscription found for invoice: ${invoice.id}`);
     return;
   }
 
   await prisma.invoice.create({
     data: {
-      userId: user.id,
-      subscriptionId: invoice.subscription as string,
+      subscriptionId: subscription.id,
       stripeInvoiceId: invoice.id,
-      amountPaid: invoice.amount_paid,
+      amountPaid: invoice.amount_paid / 100,
+      amountDue: invoice.amount_due / 100,
+      amountRemaining: invoice.amount_remaining / 100,
       currency: invoice.currency,
       status: (invoice.status?.toUpperCase() as InvoiceStatus) ?? "OPEN",
       invoiceUrl: invoice.hosted_invoice_url ?? "",

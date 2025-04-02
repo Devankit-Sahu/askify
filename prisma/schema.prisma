@@ -19,7 +19,6 @@ model User {
   createdAt        DateTime      @default(now())
   stripeCustomerId String?       @unique @map(name: "stripe_customer_id")
   subscription     Subscription?
-  Invoice          Invoice[]
 
   @@map("users")
 }
@@ -58,20 +57,19 @@ model Message {
 }
 
 model Subscription {
-  id                   String             @id @default(cuid())
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId               String             @unique
-  planName             String             @map(name: "plan_name")
-  stripeSubscriptionId String             @unique @map(name: "stripe_subscription_id")
-  stripePriceId        String             @map(name: "stripe_price_id")
-  status               SubscriptionStatus
-  currentPeriodStart   DateTime           @map(name: "stripe_current_period_start")
-  currentPeriodEnd     DateTime           @map(name: "stripe_current_period_end")
-  canceledAt           DateTime?          @map(name: "stripe_canceled_at")
-  cancelAtPeriodEnd    Boolean            @default(false)
-  invoices             Invoice[]
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  id                 String             @id @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String             @unique
+  planName           String             @map(name: "plan_name")
+  stripePriceId      String             @map(name: "stripe_price_id")
+  status             SubscriptionStatus
+  currentPeriodStart DateTime           @map(name: "stripe_current_period_start")
+  currentPeriodEnd   DateTime           @map(name: "stripe_current_period_end")
+  canceledAt         DateTime?          @map(name: "stripe_canceled_at")
+  cancelAtPeriodEnd  Boolean            @default(false)
+  invoices           Invoice[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   @@map("subscriptions")
 }
@@ -83,12 +81,12 @@ enum SubscriptionStatus {
 
 model Invoice {
   id              String        @id @default(cuid())
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription    Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  userId          String
   subscriptionId  String
   stripeInvoiceId String        @unique @map(name: "stripe_invoice_id")
   amountPaid      Int           @map(name: "amount_paid")
+  amountDue       Int           @map(name: "amount_due")
+  amountRemaining Int           @map(name: "amount_remaining")
   currency        String        @default("usd")
   status          InvoiceStatus
   invoiceUrl      String
