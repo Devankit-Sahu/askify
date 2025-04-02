@@ -26,33 +26,28 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed":
-        await handleCheckoutSessionCompleted(
+        return handleCheckoutSessionCompleted(
           event.data.object as Stripe.Checkout.Session
         );
-        break;
 
       case "customer.subscription.created":
       case "customer.subscription.updated":
-        await handleSubscriptionUpdate(
+        return handleSubscriptionUpdate(
           event.data.object as Stripe.Subscription
         );
-        break;
 
       case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(
+        return handleSubscriptionDeleted(
           event.data.object as Stripe.Subscription
         );
-        break;
 
       case "invoice.payment_succeeded":
-        await handleInvoicePaymentSucceeded(
+        return handleInvoicePaymentSucceeded(
           event.data.object as Stripe.Invoice
         );
-        break;
 
       case "invoice.payment_failed":
-        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
-        break;
+        return handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
 
       default:
         console.warn(` Unhandled event type: ${event.type}`);
