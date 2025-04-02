@@ -17,7 +17,7 @@ interface BillingFormProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>>;
 }
 
-const BillingFrom = ({ subscriptionPlan }: BillingFormProps) => {
+const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
   const handleCheckout = async () => {
     const response = await fetch("/api/checkout", {
       method: "POST",
@@ -37,7 +37,7 @@ const BillingFrom = ({ subscriptionPlan }: BillingFormProps) => {
       <CardHeader>
         <CardTitle>Subscription Plan</CardTitle>
         <CardDescription>
-          You are currently on the <strong>{subscriptionPlan.name}</strong>{" "}
+          You are currently on the <strong>{subscriptionPlan?.planName}</strong>{" "}
           plan.
         </CardDescription>
       </CardHeader>
@@ -51,17 +51,20 @@ const BillingFrom = ({ subscriptionPlan }: BillingFormProps) => {
           }}
         >
           <Button type="submit">
-            {subscriptionPlan.isSubscribed
+            {subscriptionPlan?.isSubscribed
               ? "Manage Subscription"
               : "Upgrade to PRO plan"}
           </Button>
         </form>
-        {subscriptionPlan.isSubscribed ? (
+        {subscriptionPlan?.isSubscribed ? (
           <p className="rounded-full text-xs font-medium">
             {subscriptionPlan.isCanceled
               ? "Your plan will be canceled on"
               : "Your plan renews on"}{" "}
-            {format(subscriptionPlan.stripeCurrentPeriodEnd!, "dd.MM.yyyy")}.
+            {subscriptionPlan?.currentPeriodEnd
+              ? format(subscriptionPlan.currentPeriodEnd, "dd.MM.yyyy")
+              : "N/A"}
+            .
           </p>
         ) : null}
       </CardContent>
@@ -69,4 +72,4 @@ const BillingFrom = ({ subscriptionPlan }: BillingFormProps) => {
   );
 };
 
-export default BillingFrom;
+export default BillingForm;

@@ -1,31 +1,18 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db.config";
-import { auth } from "@clerk/nextjs/server";
-import { getUserSubscriptionPlan } from "@/app/actions";
+import { loggedInUser } from "@/app/actions";
 import { stripe } from "@/lib/stripe.config";
 
 export async function POST(req: Request) {
   try {
-    const { userId } = auth();
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User is not authenticated" },
-        { status: 401 }
-      );
-    }
+    const user = await loggedInUser();
 
     const origin = req.headers.get("origin");
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    const subscriptionPlan = await getUserSubscriptionPlan();
 
-    if (subscriptionPlan.isSubscribed && user.stripeCustomerId) {
+    if (user.stripeCustomerId) {
       const session = await stripe.billingPortal.sessions.create({
         customer: user.stripeCustomerId,
         return_url: `${origin}/dashboard/billing`,

@@ -8,8 +8,8 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PineconeStore } from "@langchain/pinecone";
 import { uploadFileToCloudinary } from "../lib/cloudinary.config";
-import { PLANS } from "@/constants/constants";
-import { stripe } from "../lib/stripe.config";
+// import { PLANS } from "@/constants/constants";
+// import { stripe } from "../lib/stripe.config";
 
 export async function createUser(
   data: Omit<
@@ -207,57 +207,31 @@ export const fileUploadHandler = async (formData: FormData) => {
 };
 
 export async function getUserSubscriptionPlan() {
-  const { userId } = auth();
+  try {
+    const user = await loggedInUser();
+    if (!user) return null;
 
-  if (!userId) {
+    const subscriptionPlan = await prisma.subscription.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!subscriptionPlan)
+      return {
+        isSubscribed: false,
+        planName: "Free",
+        currentPeriodEnd: null,
+        isCanceled: false,
+      };
+
     return {
-      ...PLANS[0],
-      isSubscribed: false,
-      isCanceled: false,
-      stripeCurrentPeriodEnd: null,
+      isSubscribed: true,
+      planName: subscriptionPlan.planName,
+      currentPeriodEnd: subscriptionPlan.currentPeriodEnd,
+      isCanceled: subscriptionPlan.cancelAtPeriodEnd,
     };
+  } catch (error) {
+    throw error;
   }
-
-  const dbUser = await prisma.user.findFirst({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!dbUser) {
-    return {
-      ...PLANS[0],
-      isSubscribed: false,
-      isCanceled: false,
-      stripeCurrentPeriodEnd: null,
-    };
-  }
-
-  const isSubscribed = Boolean(
-    dbUser.stripePriceId &&
-      dbUser.stripeCurrentPeriodEnd &&
-      dbUser.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now()
-  );
-
-  const plan = isSubscribed
-    ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId)
-    : PLANS[0];
-
-  let isCanceled = false;
-
-  if (isSubscribed && dbUser.stripeSubscriptionId) {
-    const stripePlan = await stripe.subscriptions.retrieve(
-      dbUser.stripeSubscriptionId
-    );
-    isCanceled = stripePlan.cancel_at_period_end;
-  }
-
-  return {
-    ...plan,
-    stripeSubscriptionId: dbUser.stripeSubscriptionId,
-    stripeCurrentPeriodEnd: dbUser.stripeCurrentPeriodEnd,
-    stripeCustomerId: dbUser.stripeCustomerId,
-    isSubscribed,
-    isCanceled,
-  };
 }

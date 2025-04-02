@@ -11,7 +11,6 @@ import Image from "next/image";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Link from "next/link";
 import { Gem, UserRound } from "lucide-react";
-import { getUserSubscriptionPlan } from "@/app/actions";
 import CustomSignOutButton from "../CustomSignOutButton";
 
 interface UserAccountNavProps {
@@ -25,8 +24,6 @@ const UserAccountNav = async ({
   imageUrl,
   name,
 }: UserAccountNavProps) => {
-  const subscriptionPlan = await getUserSubscriptionPlan();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="overflow-visible">
@@ -75,13 +72,13 @@ const UserAccountNav = async ({
         </DropdownMenuItem>
 
         <DropdownMenuItem className="cursor-pointer" asChild>
-          {subscriptionPlan?.isSubscribed ? (
-            <Link href="/dashboard/billing">Manage Subscription</Link>
-          ) : (
-            <Link href="/pricing">
-              Upgrade <Gem className="text-blue-600 h-4 w-4 ml-1.5" />
-            </Link>
-          )}
+          <Link href="/pricing">
+            Upgrade Plan <Gem className="text-blue-600 h-4 w-4 ml-1.5" />
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="cursor-pointer" asChild>
+          <Link href="/dashboard/billing">Manage Subscription</Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

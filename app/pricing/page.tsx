@@ -2,12 +2,12 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import UpgradeButton from "@/components/UpgradeButton";
 import { plansDetails } from "@/constants/constants";
-import { currentUser } from "@clerk/nextjs/server";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { loggedInUser } from "../actions";
 
 const Pricing = async () => {
-  const user = await currentUser();
+  const user = await loggedInUser();
   return (
     <section className="min-h-screen py-20">
       <div className="container px-4">
