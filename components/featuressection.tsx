@@ -4,8 +4,8 @@ import { Brain, FileText, Search } from "lucide-react";
 const FeaturesSection = () => {
   return (
     <div>
-      <section className="py-20 bg-background relative">
-        <div className="container px-4 md:px-10">
+      <section className="py-20 md:py-28 bg-background relative overflow-hidden">
+        <div className="container px-4 md:px-10 mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">
             Unlock Your Documents&apos; Potential
           </h2>

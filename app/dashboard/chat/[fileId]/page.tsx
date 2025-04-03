@@ -20,8 +20,8 @@ const ChatPage = async ({
   }
 
   return (
-    <section className="min-h-[calc(100vh-5rem)] bg-gradient-to-b from-background to-muted flex items-center justify-center relative py-12">
-      <div className="container px-4 md:px-10">
+    <section className="min-h-[calc(100vh-5rem)] bg-gradient-to-b from-background to-muted relative py-12">
+      <div className="container px-4 md:px-10 mx-auto">
         <Card className="mx-auto w-full max-w-8xl flex flex-col lg:flex-row">
           <div className="flex-1 p-4">
             <PdfRender fileUrl={file.url} />

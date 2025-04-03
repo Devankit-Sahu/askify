@@ -3,12 +3,12 @@ import prisma from "@/lib/db.config";
 import { stripe } from "@/lib/stripe.config";
 import { headers } from "next/headers";
 import type Stripe from "stripe";
-import { InvoiceStatus } from "@prisma/client";
+import { InvoiceStatus, SubscriptionStatus } from "@prisma/client";
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const headerPayload = await headers();
-  const signature = headerPayload.get("Stripe-Signature") ?? "";
+  const headerPayload = headers();
+  const signature = (await headerPayload).get("Stripe-Signature") ?? "";
 
   let event: Stripe.Event;
 
@@ -101,7 +101,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       planName: subscription.items.data[0].price.nickname || "Pro",
       id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
-      status: subscription.status === "active" ? "ACTIVE" : "CANCELED",
+      status: subscription.status?.toUpperCase() as SubscriptionStatus,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -114,7 +114,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       planName: subscription.items.data[0].price.nickname || "Pro",
       id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
-      status: subscription.status === "active" ? "ACTIVE" : "CANCELED",
+      status: subscription.status?.toUpperCase() as SubscriptionStatus,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,

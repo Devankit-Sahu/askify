@@ -2,7 +2,7 @@ export const PLANS = [
   {
     name: "free",
     fileSizeLimit: 4,
-    pdfsPerMonth: 10,
+    pdfsPerMonth: 5,
     price: {
       amount: 0,
       priceIds: {
@@ -14,7 +14,7 @@ export const PLANS = [
   {
     name: "pro",
     fileSizeLimit: 16,
-    pdfsPerMonth: 50,
+    pdfsPerMonth: 20,
     price: {
       amount: 20,
       priceIds: {
@@ -31,7 +31,8 @@ export const plansDetails: planDetail[] = [
     description: "Perfect for trying out Askify",
     price: "0",
     features: [
-      "2 document uploads",
+      "5 document uploads",
+      "4mb file size limit",
       "100 questions per month",
       "Basic document formats(Pdf)",
       "24-hour response history",
@@ -43,6 +44,7 @@ export const plansDetails: planDetail[] = [
     price: "20",
     features: [
       "Unlimited document uploads",
+      "16mb file size limit",
       "Unlimited questions",
       "All document formats",
       "30-day response history",

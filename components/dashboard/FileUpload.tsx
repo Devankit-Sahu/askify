@@ -4,7 +4,12 @@ import { Progress } from "../ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Cloud, File, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { fileUploadHandler, getFilesByCurrentMonth } from "@/app/actions";
+import {
+  fileUploadHandler,
+  getFilesByCurrentMonth,
+  getUserSubscriptionPlan,
+} from "@/app/actions";
+import { PLANS } from "@/constants/constants";
 
 interface FileUploadProps {
   setIsOpen: (value: boolean) => void;
@@ -57,65 +62,67 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
         return;
       }
 
-      // const subscriptionPlan = await getUserSubscriptionPlan();
+      const subscriptionPlan = await getUserSubscriptionPlan();
       const files = await getFilesByCurrentMonth();
-      console.log(files);
+      const currentSubscriptionPlan = PLANS.find(
+        (plan) => plan.name === subscriptionPlan?.planName
+      );
 
-      // if (
-      //   !subscriptionPlan.isSubscribed &&
-      //   file.size > (subscriptionPlan?.fileSizeLimit ?? 4) * 1024 * 1024
-      // ) {
-      //   toast({
-      //     title: "File size exceeded",
-      //     description:
-      //       "You are on a free plan and cannot upload file more than 4mb. Please upgrade your plan.",
-      //   });
-      //   setIsUploading(false);
-      //   setIsOpen(false);
-      //   return;
-      // }
+      if (
+        !subscriptionPlan?.isSubscribed &&
+        file.size > (currentSubscriptionPlan?.fileSizeLimit ?? 4) * 1024 * 1024
+      ) {
+        toast({
+          title: "File size exceeded",
+          description:
+            "You are on a free plan and cannot upload file more than 4mb. Please upgrade your plan.",
+        });
+        setIsUploading(false);
+        setIsOpen(false);
+        return;
+      }
 
-      // if (
-      //   !subscriptionPlan.isSubscribed &&
-      //   files.length > (subscriptionPlan?.pdfsPerMonth ?? 10)
-      // ) {
-      //   toast({
-      //     title: "Files per month exceeded",
-      //     description:
-      //       "You are on a free plan and can upload 10 pdfs per month. Please upgrade your plan.",
-      //   });
-      //   setIsUploading(false);
-      //   setIsOpen(false);
-      //   return;
-      // }
+      if (
+        !subscriptionPlan?.isSubscribed &&
+        files.length > (currentSubscriptionPlan?.pdfsPerMonth ?? 5)
+      ) {
+        toast({
+          title: "Files per month exceeded",
+          description:
+            "You are on a free plan and can upload 5 pdfs per month. Please upgrade your plan.",
+        });
+        setIsUploading(false);
+        setIsOpen(false);
+        return;
+      }
 
-      // if (
-      //   subscriptionPlan.isSubscribed &&
-      //   file.size > (subscriptionPlan?.fileSizeLimit ?? 16)
-      // ) {
-      //   toast({
-      //     title: "File size exceeded",
-      //     description:
-      //       "Your plan has a file size limit of 16mb. Please upload a smaller size file.",
-      //   });
-      //   setIsUploading(false);
-      //   setIsOpen(false);
-      //   return;
-      // }
+      if (
+        subscriptionPlan?.isSubscribed &&
+        file.size > (currentSubscriptionPlan?.fileSizeLimit ?? 16) * 1024 * 1024
+      ) {
+        toast({
+          title: "File size exceeded",
+          description:
+            "Your plan has a file size limit of 16mb. Please upload a smaller size file.",
+        });
+        setIsUploading(false);
+        setIsOpen(false);
+        return;
+      }
 
-      // if (
-      //   subscriptionPlan.isSubscribed &&
-      //   files.length > (subscriptionPlan?.pdfsPerMonth ?? 50)
-      // ) {
-      //   toast({
-      //     title: "Files per month exceeded",
-      //     description:
-      //       "Your plan has a limit of 50 pdfs per month. Please upload in the billing cycle.",
-      //   });
-      //   setIsUploading(false);
-      //   setIsOpen(false);
-      //   return;
-      // }
+      if (
+        subscriptionPlan?.isSubscribed &&
+        files.length > (currentSubscriptionPlan?.pdfsPerMonth ?? 20)
+      ) {
+        toast({
+          title: "Files per month exceeded",
+          description:
+            "Your plan has a limit of 20 pdfs per month. Please upload in the billing cycle.",
+        });
+        setIsUploading(false);
+        setIsOpen(false);
+        return;
+      }
 
       const formData = new FormData();
       formData.append("file", file);

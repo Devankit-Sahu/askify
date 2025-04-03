@@ -3,8 +3,8 @@ import { Card } from "./ui/card";
 
 const HowItWorksSection = () => {
   return (
-    <section className="py-20 bg-muted/50">
-      <div className="container px-4 md:px-10">
+    <section className="py-20 md:py-28 bg-gradient-to-t from-background to-muted relative overflow-hidden">
+      <div className="container px-4 md:px-10 mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">See It In Action</h2>

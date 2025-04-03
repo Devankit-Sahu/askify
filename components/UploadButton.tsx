@@ -18,7 +18,7 @@ const UploadButton = () => {
       }}
     >
       <DialogTrigger onClick={() => setIsOpen(true)} asChild>
-        <Button className="capitalize flex items-center gap-2">
+        <Button className="capitalize flex items-center gap-2 text-foreground">
           <span>
             <Plus size={20} />
           </span>

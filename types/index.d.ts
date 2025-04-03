@@ -6,9 +6,6 @@ interface User {
   oauthId: string | null;
   oauthProvider: string | null;
   stripeCustomerId: string | null;
-  stripeSubscriptionId: string | null;
-  stripePriceId: string | null;
-  stripeCurrentPeriodEnd: Date | null;
   createdAt: Date;
 }
 

@@ -8,8 +8,6 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PineconeStore } from "@langchain/pinecone";
 import { uploadFileToCloudinary } from "../lib/cloudinary.config";
-// import { PLANS } from "@/constants/constants";
-// import { stripe } from "../lib/stripe.config";
 
 export async function createUser(
   data: Omit<
@@ -78,6 +76,8 @@ export async function updateUser(data: {
 
 export async function deleteUser(userId: string) {
   try {
+    const user = await loggedInUser();
+    if (!user) return null;
     await prisma.user.delete({ where: { id: userId } });
     return;
   } catch (error) {
@@ -86,38 +86,54 @@ export async function deleteUser(userId: string) {
 }
 
 export const getFiles = async () => {
-  const { userId } = auth();
-  if (!userId) {
-    throw new Error("User not authenticated");
+  try {
+    const user = await loggedInUser();
+    if (!user) return null;
+    return await prisma.file.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    throw error;
   }
-  return await prisma.file.findMany({
-    where: {
-      userId,
-    },
-  });
 };
 
 export const getFile = async (fileId: string) => {
-  return await prisma.file.findUnique({
-    where: {
-      id: fileId,
-    },
-  });
+  try {
+    const user = await loggedInUser();
+    if (!user) return null;
+    return await prisma.file.findUnique({
+      where: {
+        id: fileId,
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const deleteFile = async (fileId: string, publicId: string) => {
-  if (!fileId || !publicId) {
-    throw new Error("fileId and publicId are required");
-  }
+  try {
+    const user = await loggedInUser();
+    if (!user) return null;
+    if (!fileId || !publicId) {
+      throw new Error("fileId and publicId are required");
+    }
 
-  const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX!);
-  await pineconeIndex.namespace(fileId).deleteAll();
-  await deleteFileFromCloudinary(publicId);
-  return await prisma.file.delete({
-    where: {
-      id: fileId,
-    },
-  });
+    const pineconeIndex = pinecone.index(process.env.PINECONE_INDEX!);
+    await pineconeIndex.namespace(fileId).deleteAll();
+    await deleteFileFromCloudinary(publicId);
+    await prisma.file.delete({
+      where: {
+        id: fileId,
+      },
+    });
+    return;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getFilesByCurrentMonth = async () => {

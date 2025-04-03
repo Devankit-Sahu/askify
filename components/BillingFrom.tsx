@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -36,26 +36,12 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
     <Card>
       <CardHeader>
         <CardTitle>Subscription Plan</CardTitle>
-        <CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
+        <p>
           You are currently on the <strong>{subscriptionPlan?.planName}</strong>{" "}
           plan.
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="flex flex-col items-start space-y-2 md:flex-row md:justify-between md:space-x-0">
-        <form
-          method="POST"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleCheckout();
-          }}
-        >
-          <Button type="submit">
-            {subscriptionPlan?.isSubscribed
-              ? "Manage Subscription"
-              : "Upgrade to PRO plan"}
-          </Button>
-        </form>
+        </p>
         {subscriptionPlan?.isSubscribed ? (
           <p className="rounded-full text-xs font-medium">
             {subscriptionPlan.isCanceled
@@ -68,6 +54,21 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
           </p>
         ) : null}
       </CardContent>
+      <CardFooter>
+        <form
+          method="POST"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleCheckout();
+          }}
+        >
+          <Button type="submit" className="text-foreground">
+            {subscriptionPlan?.isSubscribed
+              ? "Manage Subscription"
+              : "Upgrade to PRO plan"}
+          </Button>
+        </form>
+      </CardFooter>
     </Card>
   );
 };

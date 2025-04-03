@@ -10,7 +10,7 @@ const Pricing = async () => {
   const user = await loggedInUser();
   return (
     <section className="min-h-screen py-20">
-      <div className="container px-4">
+      <div className="container px-4 md:px-10 mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl font-bold mb-4">
             Simple, transparent pricing

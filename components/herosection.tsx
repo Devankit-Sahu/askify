@@ -7,7 +7,7 @@ const HeroSection = () => {
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-background to-muted relative overflow-hidden">
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:16px_16px]" />
-      <div className="container px-4 md:px-10 relative">
+      <div className="container px-4 md:px-10 relative mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">

@@ -4,8 +4,8 @@ import { ArrowRight } from "lucide-react";
 
 const CtaSection = () => {
   return (
-    <section className="py-20 bg-background">
-      <div className="container px-4 md:px-10">
+    <section className="py-20 md:py-28 bg-background relative overflow-hidden">
+      <div className="container px-4 md:px-10 mx-auto">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to Transform Your Documents?
