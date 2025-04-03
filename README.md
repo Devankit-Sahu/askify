@@ -1,7 +1,7 @@
 # Askify - AI-Powered PDF Query SaaS
 
 ![HomePage Preview](public/homepage.png)
-![FileUpload Preview](public/fileupload-preview.png)
+![FileUpload Preview](public/fileupload.png)
 ![ChatInterface Preview](public/preview.png)
 
 **Askify** is a cutting-edge AI SaaS application designed to allow users to upload PDF documents and query them using advanced AI models. The platform streamlines the process of extracting meaningful insights and answers from large PDF documents, making it ideal for researchers, professionals, and anyone handling a large amount of textual data.
