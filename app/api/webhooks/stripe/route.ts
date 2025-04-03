@@ -26,31 +26,37 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed":
-        return handleCheckoutSessionCompleted(
+        await handleCheckoutSessionCompleted(
           event.data.object as Stripe.Checkout.Session
         );
+        break;
 
       case "customer.subscription.created":
       case "customer.subscription.updated":
-        return handleSubscriptionUpdate(
+        await handleSubscriptionUpdate(
           event.data.object as Stripe.Subscription
         );
+        break;
 
       case "customer.subscription.deleted":
-        return handleSubscriptionDeleted(
+        await handleSubscriptionDeleted(
           event.data.object as Stripe.Subscription
         );
+        break;
 
       case "invoice.payment_succeeded":
-        return handleInvoicePaymentSucceeded(
+        await handleInvoicePaymentSucceeded(
           event.data.object as Stripe.Invoice
         );
+        break;
 
       case "invoice.payment_failed":
-        return handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        break;
 
       default:
         console.warn(` Unhandled event type: ${event.type}`);
+        break;
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
@@ -80,7 +86,7 @@ async function handleCheckoutSessionCompleted(
 
 // Handle Subscription Create/Update
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { stripeCustomerId: subscription.customer as string },
   });
 
@@ -121,7 +127,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
 // Handle Subscription Deletion
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { stripeCustomerId: subscription.customer as string },
   });
 
@@ -134,13 +140,27 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 // Handle Invoice Payment Success
-async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const subscription = await prisma.subscription.findUnique({
+async function handleInvoicePaymentSucceeded(
+  invoice: Stripe.Invoice,
+  attempts = 0
+) {
+  const MAX_RETRIES = 3;
+
+  const subscription = await prisma.subscription.findFirst({
     where: { id: invoice.subscription as string },
   });
 
   if (!subscription) {
-    console.error(`No subscription found for invoice: ${invoice.id}`);
+    if (attempts >= MAX_RETRIES) {
+      console.error(`Max retries reached for invoice: ${invoice.id}`);
+      return;
+    }
+
+    console.warn(
+      `No subscription found immediately for invoice: ${invoice.id}. Retrying in 3 seconds...`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    handleInvoicePaymentSucceeded(invoice, attempts + 1);
     return;
   }
 
