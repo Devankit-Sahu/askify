@@ -1,27 +1,19 @@
 export const PLANS = [
   {
-    name: "free",
+    name: "Free",
     fileSizeLimit: 4,
     pdfsPerMonth: 5,
-    price: {
-      amount: 0,
-      priceIds: {
-        test: "",
-        production: "",
-      },
-    },
+    noOfQuestionPerMonth: 100,
+    docTypeSupported: ["pdf"],
+    amount: 0,
   },
   {
-    name: "pro",
+    name: "Pro",
     fileSizeLimit: 16,
     pdfsPerMonth: 20,
-    price: {
-      amount: 20,
-      priceIds: {
-        test: process.env.STRIPE_PRICE_ID_PRO_TEST,
-        production: "",
-      },
-    },
+    noOfQuestionPerMonth: null,
+    docTypeSupported: ["pdf", "docx", "txt", "pptx", "xlsx"],
+    amount: 20,
   },
 ];
 

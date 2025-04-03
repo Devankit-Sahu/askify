@@ -1,4 +1,5 @@
-import { loggedInUser } from "@/app/actions";
+import { getUserSubscriptionPlan, loggedInUser } from "@/app/actions";
+import { PLANS } from "@/constants/constants";
 import prisma from "@/lib/db.config";
 import { model } from "@/lib/google-genai.config";
 import { pinecone } from "@/lib/pinecone.config";
@@ -37,6 +38,28 @@ export async function POST(req: Request) {
 
     if (!file) {
       return NextResponse.json({ error: "File not found", status: 404 });
+    }
+
+    // Fetch previous messages from the database
+    const userMessages = await prisma.message.findMany({
+      where: { fileId, isUserMessage: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const subscriptionPlan = await getUserSubscriptionPlan();
+    const currentSubscriptionPlan = PLANS.find(
+      (plan) => plan.name === subscriptionPlan?.planName
+    );
+
+    if (
+      currentSubscriptionPlan &&
+      currentSubscriptionPlan?.noOfQuestionPerMonth !== null &&
+      userMessages.length > currentSubscriptionPlan?.noOfQuestionPerMonth
+    ) {
+      return NextResponse.json({
+        error: "You have reached your monthly question limit",
+        status: 400,
+      });
     }
 
     await prisma.message.create({

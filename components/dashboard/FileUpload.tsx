@@ -52,16 +52,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
         return;
       }
 
-      if (!file.type.startsWith("application/pdf")) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload a PDF file",
-        });
-        setIsUploading(false);
-        setIsOpen(false);
-        return;
-      }
-
       const subscriptionPlan = await getUserSubscriptionPlan();
       const files = await getFilesByCurrentMonth();
       const currentSubscriptionPlan = PLANS.find(
@@ -69,10 +59,28 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
       );
 
       if (
+        subscriptionPlan?.isSubscribed &&
+        currentSubscriptionPlan?.docTypeSupported.includes(
+          file.name.split(".")[1]
+        )
+      ) {
+        toast({
+          variant: "destructive",
+          title: "Unsupported file type",
+          description:
+            "You are on a free plan and can only upload pdf files. Please upgrade your plan.",
+        });
+        setIsUploading(false);
+        setIsOpen(false);
+        return;
+      }
+
+      if (
         !subscriptionPlan?.isSubscribed &&
         file.size > (currentSubscriptionPlan?.fileSizeLimit ?? 4) * 1024 * 1024
       ) {
         toast({
+          variant: "destructive",
           title: "File size exceeded",
           description:
             "You are on a free plan and cannot upload file more than 4mb. Please upgrade your plan.",
@@ -87,6 +95,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
         files.length > (currentSubscriptionPlan?.pdfsPerMonth ?? 5)
       ) {
         toast({
+          variant: "destructive",
           title: "Files per month exceeded",
           description:
             "You are on a free plan and can upload 5 pdfs per month. Please upgrade your plan.",
@@ -101,6 +110,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
         file.size > (currentSubscriptionPlan?.fileSizeLimit ?? 16) * 1024 * 1024
       ) {
         toast({
+          variant: "destructive",
           title: "File size exceeded",
           description:
             "Your plan has a file size limit of 16mb. Please upload a smaller size file.",
@@ -115,9 +125,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ setIsOpen }) => {
         files.length > (currentSubscriptionPlan?.pdfsPerMonth ?? 20)
       ) {
         toast({
+          variant: "destructive",
           title: "Files per month exceeded",
-          description:
-            "Your plan has a limit of 20 pdfs per month. Please upload in the billing cycle.",
+          description: "Your plan has a limit of 20 pdfs per month.",
         });
         setIsUploading(false);
         setIsOpen(false);
