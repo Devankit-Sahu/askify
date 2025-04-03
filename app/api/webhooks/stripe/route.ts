@@ -160,8 +160,7 @@ async function handleInvoicePaymentSucceeded(
       `No subscription found immediately for invoice: ${invoice.id}. Retrying in 3 seconds...`
     );
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    handleInvoicePaymentSucceeded(invoice, attempts + 1);
-    return;
+    return await handleInvoicePaymentSucceeded(invoice, attempts + 1);
   }
 
   await prisma.invoice.create({
