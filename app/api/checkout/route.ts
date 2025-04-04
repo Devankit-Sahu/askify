@@ -30,8 +30,8 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/dashboard/billing`,
-      cancel_url: `${origin}/pricing`,
+      success_url: `${origin}/subscription/success`,
+      cancel_url: `${origin}/subscription/cancel`,
       metadata: {
         userId: user.id,
       },

@@ -4,10 +4,11 @@ import UpgradeButton from "@/components/UpgradeButton";
 import { plansDetails } from "@/constants/constants";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { loggedInUser } from "../actions";
+import { getUserSubscriptionPlan, loggedInUser } from "../actions";
 
 const Pricing = async () => {
   const user = await loggedInUser();
+  const subscriptionPlan = await getUserSubscriptionPlan();
   return (
     <section className="min-h-screen py-20">
       <div className="container px-4 md:px-10 mx-auto">
@@ -67,7 +68,7 @@ const Pricing = async () => {
                   start for free
                 </Link>
               ) : user ? (
-                <UpgradeButton />
+                <UpgradeButton isSubscribed={subscriptionPlan?.isSubscribed} />
               ) : (
                 <Link
                   href="/sign-in"
