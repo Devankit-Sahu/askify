@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import prisma from "../lib/db.config";
 import { deleteFileFromCloudinary } from "../lib/cloudinary.config";
 import { pinecone } from "../lib/pinecone.config";
@@ -78,6 +78,7 @@ export async function deleteUser(userId: string) {
   try {
     const user = await loggedInUser();
     if (!user) return null;
+    await clerkClient.users.deleteUser(userId);
     await prisma.user.delete({ where: { id: userId } });
     return;
   } catch (error) {

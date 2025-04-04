@@ -60,21 +60,14 @@ export async function POST(req: Request) {
       });
     }
 
-    const oauthId = external_accounts[0].id || null;
-    const oauthProvider = external_accounts[0].provider || null;
+    const oauthId = external_accounts?.[0]?.id || null;
+    const oauthProvider = external_accounts?.[0]?.provider || null;
 
-    const userData: Omit<
-      User,
-      | "createdAt"
-      | "stripeCustomerId"
-      | "stripeSubscriptionId"
-      | "stripePriceId"
-      | "stripeCurrentPeriodEnd"
-    > = {
+    const userData: Omit<User, "createdAt" | "stripeCustomerId"> = {
       id: id,
       imageUrl: image_url,
       email: email_addresses[0].email_address,
-      username: username,
+      username: username || email_addresses[0].email_address.split("@")[0],
       oauthId,
       oauthProvider,
     };

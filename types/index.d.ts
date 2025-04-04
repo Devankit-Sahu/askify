@@ -1,7 +1,7 @@
 interface User {
   id: string;
   email: string;
-  username: string | null;
+  username: string;
   imageUrl: string | null;
   oauthId: string | null;
   oauthProvider: string | null;
