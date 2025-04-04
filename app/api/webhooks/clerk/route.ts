@@ -60,8 +60,8 @@ export async function POST(req: Request) {
       });
     }
 
-    const oauthId = external_accounts[0].id;
-    const oauthProvider = external_accounts[0].provider;
+    const oauthId = external_accounts[0].id || null;
+    const oauthProvider = external_accounts[0].provider || null;
 
     const userData: Omit<
       User,
