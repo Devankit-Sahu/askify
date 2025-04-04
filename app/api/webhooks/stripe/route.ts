@@ -7,8 +7,8 @@ import { InvoiceStatus, SubscriptionStatus } from "@prisma/client";
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const headerPayload = headers();
-  const signature = (await headerPayload).get("Stripe-Signature") ?? "";
+  const headerPayload = await headers();
+  const signature = headerPayload.get("Stripe-Signature") ?? "";
 
   let event: Stripe.Event;
 
@@ -33,29 +33,23 @@ export async function POST(request: Request) {
 
       case "customer.subscription.created":
       case "customer.subscription.updated":
-        await handleSubscriptionUpdate(
-          event.data.object as Stripe.Subscription
-        );
-        break;
-
       case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(
-          event.data.object as Stripe.Subscription
+        await handleSubscription(
+          event.data.object as Stripe.Subscription,
+          event.type.split(".")[2]
         );
         break;
 
       case "invoice.payment_succeeded":
-        await handleInvoicePaymentSucceeded(
-          event.data.object as Stripe.Invoice
-        );
+        await handleInvoice(event.data.object as Stripe.Invoice, "succeeded");
         break;
 
       case "invoice.payment_failed":
-        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
+        await handleInvoice(event.data.object as Stripe.Invoice, "failed");
         break;
 
       default:
-        console.warn(` Unhandled event type: ${event.type}`);
+        console.warn(`⚠️ Unhandled event type: ${event.type}`);
         break;
     }
 
@@ -73,34 +67,59 @@ export async function POST(request: Request) {
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session
 ) {
-  if (!session?.metadata?.userId || !session.subscription) {
-    console.error("Missing userId or subscription ID in Checkout Session.");
+  const userId = session.metadata?.userId;
+  const customerId = session.customer as string;
+  const subscriptionId = session.subscription as string;
+
+  if (!userId || !customerId || !subscriptionId) {
+    console.error("❌ Missing data in Checkout Session");
     return;
   }
 
   await prisma.user.update({
-    where: { id: session.metadata.userId },
-    data: { stripeCustomerId: session.customer as string },
+    where: { id: userId },
+    data: { stripeCustomerId: customerId },
   });
+
+  const stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
+  if (stripeSub) {
+    await handleSubscription(stripeSub, "created");
+  } else {
+    console.error("❌ Subscription not found immediately after checkout.");
+  }
 }
 
-// Handle Subscription Create/Update
-async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
+// Handle Subscription Create/Update/Delete
+async function handleSubscription(
+  subscription: Stripe.Subscription,
+  eventType: string,
+  attempts = 0
+) {
+  const MAX_RETRIES = 3;
+
   const user = await prisma.user.findFirst({
     where: { stripeCustomerId: subscription.customer as string },
   });
 
   if (!user) {
-    console.error(` No user found for customerId: ${subscription.customer}`);
-    return;
+    if (attempts >= MAX_RETRIES) {
+      console.error(
+        `❌ User not found after ${MAX_RETRIES} attempts for customerId: ${subscription.customer}`
+      );
+      return;
+    }
+
+    console.warn(`⏳ User not found. Retrying (${attempts + 1})...`);
+    await delay(3000);
+    return await handleSubscription(subscription, eventType, attempts + 1);
   }
 
   await prisma.subscription.upsert({
     where: { userId: user.id },
     update: {
-      planName: subscription.items.data[0].price.nickname || "Pro",
       id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
+      planName: subscription.items.data[0].price.nickname || "Pro",
       status: subscription.status?.toUpperCase() as SubscriptionStatus,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -111,9 +130,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     },
     create: {
       userId: user.id,
-      planName: subscription.items.data[0].price.nickname || "Pro",
       id: subscription.id,
       stripePriceId: subscription.items.data[0].price.id,
+      planName: subscription.items.data[0].price.nickname || "Pro",
       status: subscription.status?.toUpperCase() as SubscriptionStatus,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
@@ -125,23 +144,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   });
 }
 
-// Handle Subscription Deletion
-async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  const user = await prisma.user.findFirst({
-    where: { stripeCustomerId: subscription.customer as string },
-  });
-
-  if (!user) {
-    console.error(`No user found for deleted subscription: ${subscription.id}`);
-    return;
-  }
-
-  await prisma.subscription.deleteMany({ where: { userId: user.id } });
-}
-
-// Handle Invoice Payment Success
-async function handleInvoicePaymentSucceeded(
+// Handle Invoice (Success & Failure)
+async function handleInvoice(
   invoice: Stripe.Invoice,
+  eventType: "succeeded" | "failed",
   attempts = 0
 ) {
   const MAX_RETRIES = 3;
@@ -152,15 +158,15 @@ async function handleInvoicePaymentSucceeded(
 
   if (!subscription) {
     if (attempts >= MAX_RETRIES) {
-      console.error(`Max retries reached for invoice: ${invoice.id}`);
+      console.error(`❌ Max retries reached for invoice: ${invoice.id}`);
       return;
     }
 
     console.warn(
-      `No subscription found immediately for invoice: ${invoice.id}. Retrying in 3 seconds...`
+      `⏳ Subscription not found. Retrying invoice (${attempts + 1})...`
     );
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    return await handleInvoicePaymentSucceeded(invoice, attempts + 1);
+    await delay(3000);
+    return await handleInvoice(invoice, eventType, attempts + 1);
   }
 
   await prisma.invoice.create({
@@ -168,36 +174,15 @@ async function handleInvoicePaymentSucceeded(
       subscriptionId: subscription.id,
       stripeInvoiceId: invoice.id,
       amountPaid: invoice.amount_paid / 100,
-      amountDue: invoice.amount_due / 100,
+      amountDue: eventType === "succeeded" ? 0 : invoice.amount_due / 100,
       amountRemaining: invoice.amount_remaining / 100,
       currency: invoice.currency,
-      status: (invoice.status?.toUpperCase() as InvoiceStatus) ?? "PAID",
+      status: invoice.status?.toUpperCase() as InvoiceStatus,
       invoiceUrl: invoice.hosted_invoice_url ?? "",
     },
   });
 }
 
-// Handle Invoice Payment Failure
-async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  const subscription = await prisma.subscription.findUnique({
-    where: { id: invoice.subscription as string },
-  });
-
-  if (!subscription) {
-    console.error(`No subscription found for invoice: ${invoice.id}`);
-    return;
-  }
-
-  await prisma.invoice.create({
-    data: {
-      subscriptionId: subscription.id,
-      stripeInvoiceId: invoice.id,
-      amountPaid: invoice.amount_paid / 100,
-      amountDue: invoice.amount_due / 100,
-      amountRemaining: invoice.amount_remaining / 100,
-      currency: invoice.currency,
-      status: (invoice.status?.toUpperCase() as InvoiceStatus) ?? "OPEN",
-      invoiceUrl: invoice.hosted_invoice_url ?? "",
-    },
-  });
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
